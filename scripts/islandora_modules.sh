@@ -23,6 +23,10 @@ while read -r LINE; do
   git clone https://github.com/Islandora/"$LINE"
 done < "$SHARED_DIR"/configs/islandora-module-list-sans-tuque.txt
 
+# clone islandora usage stats callbacks needed for displaying view / download count
+cd "$DRUPAL_HOME"/sites/all/modules || exit
+git clone https://github.com/Islandora-Labs/islandora_usage_stats_callbacks.git
+
 # Set git filemode false for git
 cd "$DRUPAL_HOME"/sites/all/modules || exit
 while read -r LINE; do
@@ -78,7 +82,7 @@ drush -y -u 1 en islandora_basic_collection islandora_pdf islandora_audio island
 drush -y -u 1 en islandora_premis islandora_checksum islandora_checksum_checker
 drush -y -u 1 en islandora_book_batch islandora_pathauto islandora_pdfjs islandora_videojs
 drush -y -u 1 en xml_forms xml_form_builder xml_schema_api xml_form_elements xml_form_api jquery_update zip_importer islandora_basic_image islandora_bibliography islandora_compound_object islandora_google_scholar islandora_scholar_embargo islandora_solr_config citation_exporter doi_importer endnotexml_importer pmid_importer ris_importer
-drush -y -u 1 en islandora_fits islandora_ocr islandora_oai islandora_marcxml islandora_simple_workflow islandora_xacml_api islandora_xacml_editor islandora_xmlsitemap colorbox islandora_internet_archive_bookreader islandora_bagit islandora_batch_report islandora_usage_stats islandora_form_fieldpanel islandora_altmetrics islandora_populator islandora_newspaper_batch 
+drush -y -u 1 en islandora_fits islandora_ocr islandora_oai islandora_marcxml islandora_simple_workflow islandora_xacml_api islandora_xacml_editor islandora_xmlsitemap colorbox islandora_internet_archive_bookreader islandora_bagit islandora_batch_report islandora_usage_stats islandora_usage_stats_callbacks islandora_form_fieldpanel islandora_altmetrics islandora_populator islandora_newspaper_batch 
 
 cd "$DRUPAL_HOME"/sites/all/modules || exit
 
@@ -101,3 +105,7 @@ drush eval "variable_set('islandora_ocr_tesseract', '/usr/bin/tesseract')"
 drush eval "variable_set('islandora_batch_java', '/usr/bin/java')"
 drush eval "variable_set('image_toolkit', 'imagemagick')"
 drush eval "variable_set('imagemagick_convert', '/usr/bin/convert')"
+
+# Grant permissions for everyone to see the download count
+drush role-add-perm 'anonymous user' 'access usage stats callbacks api'
+drush role-add-perm 'authenticated user' 'access usage stats callbacks api'
